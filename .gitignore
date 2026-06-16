@@ -39,6 +39,9 @@ desktop.ini
 # ===== Docker 数据卷 =====
 db-data/
 
+# ===== 旧项目残留 =====
+gradle.properties
+
 # ===== 嵌套重复目录 =====
 elderly-care-backend/elderly-care-backend/
 
