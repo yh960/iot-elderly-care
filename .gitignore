@@ -48,5 +48,10 @@ elderly-care-backend/elderly-care-backend/
 # ===== 环境变量（含密钥的文件）=====
 .env
 
-# ===== 启动脚本生成的临时文件 =====
+# ===== 本地启动脚本 =====
+start*.bat
+start*.sh
+restart.*
+stop.*
+DEPLOYMENT.md
 start_log.txt
