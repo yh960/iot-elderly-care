@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老年人跌倒检测系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav id="navbar" class="navbar hidden">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">🏠</span>
+                <span>老年人跌倒检测系统</span>
+            </div>
+            <div class="nav-links" id="nav-links">
+                <a href="#" onclick="showPage('dashboard')" class="nav-link">
+                    <span class="nav-icon">📊</span>
+                    <span>控制台</span>
+                </a>
+                <a href="#" onclick="showPage('devices')" class="nav-link">
+                    <span class="nav-icon">📱</span>
+                    <span>设备管理</span>
+                </a>
+                <a href="#" onclick="showPage('users')" class="nav-link">
+                    <span class="nav-icon">👤</span>
+                    <span>用户管理</span>
+                </a>
+                <a href="#" onclick="showPage('ai-test')" class="nav-link">
+                    <span class="nav-icon">🤖</span>
+                    <span>AI测试</span>
+                </a>
+                <a href="#" onclick="showPage('alerts')" class="nav-link">
+                    <span class="nav-icon">⚠️</span>
+                    <span>告警中心</span>
+                    <span id="alert-badge" class="badge hidden">0</span>
+                </a>
+                <a href="#" onclick="logout()" class="nav-link logout">
+                    <span class="nav-icon">🚪</span>
+                    <span>退出</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div id="login-page" class="page active">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="login-header">
+                    <div class="logo">🤖</div>
+                    <h1>老年人跌倒检测系统</h1>
+                    <p class="subtitle">基于AI技术的智能健康监护平台</p>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('login')">登录</button>
+                    <button class="tab-btn" onclick="switchTab('register')">注册</button>
+                </div>
+
+                <div id="login-form" class="form-container">
+                    <div class="form-group">
+                        <label for="login-username">用户名</label>
+                        <input type="text" id="login-username" placeholder="请输入用户名" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">密码</label>
+                        <input type="password" id="login-password" placeholder="请输入密码" class="form-input">
+                    </div>
+                    <button class="btn btn-primary" onclick="login()">登录系统</button>
+                    <button class="btn btn-secondary" onclick="getTestToken()">获取测试账号</button>
+                </div>
+
+                <div id="register-form" class="form-container hidden">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-username">用户名 *</label>
+                            <input type="text" id="reg-username" placeholder="用户名" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-password">密码 *</label>
+                            <input type="password" id="reg-password" placeholder="密码" class="form-input">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-name">姓名 *</label>
+                            <input type="text" id="reg-name" placeholder="姓名" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-phone">手机号 *</label>
+                            <input type="text" id="reg-phone" placeholder="手机号" class="form-input">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-family-phone">家属电话 *</label>
+                            <input type="text" id="reg-family-phone" placeholder="家属电话" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-age">年龄</label>
+                            <input type="number" id="reg-age" placeholder="年龄" class="form-input">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-gender">性别</label>
+                            <select id="reg-gender" class="form-input">
+                                <option value="">请选择</option>
+                                <option value="男">男</option>
+                                <option value="女">女</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-user-type">用户类型</label>
+                            <select id="reg-user-type" class="form-input">
+                                <option value="ELDERLY">老人</option>
+                                <option value="FAMILY">家属</option>
+                                <option value="ADMIN">管理员</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-address">地址</label>
+                        <input type="text" id="reg-address" placeholder="地址" class="form-input">
+                    </div>
+                    <button class="btn btn-primary" onclick="register()">注册账号</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard" class="page hidden">
+        <div class="page-header">
+            <div class="header-left">
+                <h1>控制台</h1>
+                <p class="subtitle">实时监控老人健康状态</p>
+            </div>
+            <div class="user-info">
+                <span class="welcome-text">欢迎, </span>
+                <span id="current-user" class="user-name">用户</span>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-icon bg-blue">📱</div>
+                <div class="stat-content">
+                    <div class="stat-label">设备数量</div>
+                    <div class="stat-value" id="device-count">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-red">⚠️</div>
+                <div class="stat-content">
+                    <div class="stat-label">待处理告警</div>
+                    <div class="stat-value" id="alert-count">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-green">👤</div>
+                <div class="stat-content">
+                    <div class="stat-label">用户数量</div>
+                    <div class="stat-value" id="user-count">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-purple">🤖</div>
+                <div class="stat-content">
+                    <div class="stat-label">AI分析次数</div>
+                    <div class="stat-value" id="ai-analysis-count">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-sections">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>最近告警记录</h2>
+                    <button class="btn btn-sm btn-secondary" onclick="showPage('alerts')">查看全部</button>
+                </div>
+                <div id="recent-alerts-list" class="list-container"></div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>设备状态概览</h2>
+                    <button class="btn btn-sm btn-secondary" onclick="showPage('devices')">管理设备</button>
+                </div>
+                <div id="device-status-list" class="list-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="devices" class="page hidden">
+        <div class="page-header">
+            <div class="header-left">
+                <h1>设备管理</h1>
+                <p class="subtitle">监控和管理所有设备</p>
+            </div>
+            <button class="btn btn-primary" onclick="showDeviceModal()">
+                <span class="btn-icon">➕</span>
+                添加设备
+            </button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="device-search" placeholder="搜索设备ID或位置..." onkeyup="searchDevices()">
+            <button class="search-btn" onclick="searchDevices()">🔍</button>
+        </div>
+
+        <div id="device-list" class="table-container"></div>
+    </div>
+
+    <div id="users" class="page hidden">
+        <div class="page-header">
+            <div class="header-left">
+                <h1>用户管理</h1>
+                <p class="subtitle">管理系统用户和老人信息</p>
+            </div>
+            <button class="btn btn-primary" onclick="showUserModal()">
+                <span class="btn-icon">➕</span>
+                添加用户
+            </button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="user-search" placeholder="搜索用户名或姓名..." onkeyup="searchUsers()">
+            <button class="search-btn" onclick="searchUsers()">🔍</button>
+        </div>
+
+        <div id="user-list" class="table-container"></div>
+    </div>
+
+    <div id="ai-test" class="page hidden">
+        <div class="page-header">
+            <div class="header-left">
+                <h1>AI测试分析</h1>
+                <p class="subtitle">使用智谱清言GLM4大模型进行跌倒风险分析</p>
+            </div>
+        </div>
+
+        <div class="ai-test-container">
+            <div class="ai-panel">
+                <div class="panel-header">
+                    <h3>📡 数据输入</h3>
+                    <p>设置测试参数进行AI分析</p>
+                </div>
+                <div class="panel-content">
+                    <div class="form-group">
+                        <label for="ai-device">选择设备</label>
+                        <select id="ai-device" class="form-input"></select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ai-speed">速度 (m/s)</label>
+                            <div class="range-control">
+                                <input type="range" id="ai-speed" min="0" max="10" step="0.1" value="2.5">
+                                <span id="ai-speed-value" class="range-value">2.5</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ai-trajectoryx">轨迹X</label>
+                            <div class="range-control">
+                                <input type="range" id="ai-trajectoryx" min="-10" max="10" step="0.5" value="0">
+                                <span id="ai-trajectoryx-value" class="range-value">0.0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ai-trajectoryy">轨迹Y</label>
+                            <div class="range-control">
+                                <input type="range" id="ai-trajectoryy" min="-10" max="10" step="0.5" value="0">
+                                <span id="ai-trajectoryy-value" class="range-value">0.0</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ai-rawdata">原始数据</label>
+                            <input type="text" id="ai-rawdata" class="form-input" placeholder='{"sensor":"radar","waveform":[0.1,0.2,0.5]}'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-panel">
+                <div class="panel-header">
+                    <h3>⚡ AI分析操作</h3>
+                    <p>调用大模型进行跌倒检测分析</p>
+                </div>
+                <div class="panel-content">
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary btn-large" onclick="startAiAnalysis()">
+                            <span class="btn-icon">🤖</span>
+                            执行AI分析
+                        </button>
+                        <button class="btn btn-danger btn-large" onclick="simulateFallDetection()">
+                            <span class="btn-icon">⚠️</span>
+                            模拟跌倒事件
+                        </button>
+                        <button class="btn btn-warning btn-large" onclick="sendRadarData()">
+                            <span class="btn-icon">📡</span>
+                            发送雷达数据
+                        </button>
+                    </div>
+
+                    <div id="ai-progress" class="progress-container hidden">
+                        <div class="progress-header">
+                            <span class="progress-title">AI分析中...</span>
+                            <span class="progress-dots">●●●</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="ai-progress-fill"></div>
+                        </div>
+                        <div class="progress-steps">
+                            <span class="step active">📤 数据上传</span>
+                            <span class="step">🧠 AI处理</span>
+                            <span class="step">📊 结果分析</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-panel ai-result-panel">
+                <div class="panel-header">
+                    <h3>📊 AI分析结果</h3>
+                    <span id="result-status" class="status-badge status-pending">等待分析</span>
+                </div>
+                <div id="ai-result-content" class="result-content">
+                    <div class="empty-state">
+                        <div class="empty-icon">🤖</div>
+                        <p>点击上方按钮开始AI分析</p>
+                        <p class="empty-hint">系统将使用GLM-4-Flash模型进行跌倒风险评估</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="alerts" class="page hidden">
+        <div class="page-header">
+            <div class="header-left">
+                <h1>告警中心</h1>
+                <p class="subtitle">管理和处理所有告警事件</p>
+            </div>
+            <button class="btn btn-primary" onclick="loadAlerts()">
+                <span class="btn-icon">🔄</span>
+                刷新列表
+            </button>
+        </div>
+
+        <div class="filter-bar">
+            <select id="alert-status-filter" onchange="loadAlerts()">
+                <option value="ALL">全部状态</option>
+                <option value="PENDING">待处理</option>
+                <option value="CONFIRMED">已确认</option>
+                <option value="RESOLVED">已解决</option>
+            </select>
+            <select id="alert-type-filter" onchange="loadAlerts()">
+                <option value="ALL">全部类型</option>
+                <option value="FALL">跌倒告警</option>
+                <option value="SITTING">静止告警</option>
+            </select>
+        </div>
+
+        <div id="alert-table" class="table-container"></div>
+    </div>
+
+    <div id="device-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('device-modal')">&times;</span>
+            <h2 id="device-modal-title">添加设备</h2>
+            <input type="hidden" id="device-db-id">
+            <input type="hidden" id="original-device-id">
+            <div class="form-group">
+                <label for="modal-device-id">设备ID *</label>
+                <input type="text" id="modal-device-id" class="form-input" placeholder="设备唯一标识">
+            </div>
+            <div class="form-group">
+                <label for="modal-location">安装位置 *</label>
+                <input type="text" id="modal-location" class="form-input" placeholder="如：卧室、客厅">
+            </div>
+            <div class="form-group">
+                <label for="modal-user-id">关联用户 *</label>
+                <select id="modal-user-id" class="form-input"></select>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeModal('device-modal')">取消</button>
+                <button class="btn btn-primary" onclick="saveDevice()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="user-modal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closeModal('user-modal')">&times;</span>
+            <h2 id="user-modal-title">添加用户</h2>
+            <input type="hidden" id="user-db-id">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="modal-username">用户名 *</label>
+                    <input type="text" id="modal-username" class="form-input" placeholder="用户名">
+                </div>
+                <div class="form-group">
+                    <label for="modal-password">密码</label>
+                    <input type="password" id="modal-password" class="form-input" placeholder="密码（编辑时可不填）">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="modal-name">姓名 *</label>
+                    <input type="text" id="modal-name" class="form-input" placeholder="姓名">
+                </div>
+                <div class="form-group">
+                    <label for="modal-phone">手机号 *</label>
+                    <input type="text" id="modal-phone" class="form-input" placeholder="手机号">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="modal-family-phone">家属电话 *</label>
+                    <input type="text" id="modal-family-phone" class="form-input" placeholder="家属电话">
+                </div>
+                <div class="form-group">
+                    <label for="modal-age">年龄</label>
+                    <input type="number" id="modal-age" class="form-input" placeholder="年龄">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="modal-gender">性别</label>
+                    <select id="modal-gender" class="form-input">
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="modal-user-type">用户类型</label>
+                    <select id="modal-user-type" class="form-input">
+                        <option value="ELDERLY">老人</option>
+                        <option value="FAMILY">家属</option>
+                        <option value="ADMIN">管理员</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="modal-address">地址</label>
+                <input type="text" id="modal-address" class="form-input" placeholder="地址">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeModal('user-modal')">取消</button>
+                <button class="btn btn-primary" onclick="saveUser()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="alert-detail-modal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closeModal('alert-detail-modal')">&times;</span>
+            <div class="modal-header">
+                <h2>告警详情</h2>
+                <span id="alert-detail-status" class="status-badge"></span>
+            </div>
+            <div id="alert-detail-content" class="detail-content"></div>
+            <div id="alert-detail-actions" class="detail-actions"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

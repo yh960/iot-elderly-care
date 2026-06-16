@@ -1,0 +1,37 @@
+# ==================== 服务器配置 ====================
+server:
+  port: ${SERVER_PORT:8080}          # 服务端口，默认 8080，可通过环境变量 SERVER_PORT 覆盖
+  address: 0.0.0.0                   # 监听所有网卡（允许外部访问，不仅限于 localhost）
+
+# ==================== Spring 配置 ====================
+spring:
+  # ---------- 数据源（MySQL） ----------
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/elderly_care?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+    # 数据库：elderly_care，MySQL 8.x，时区设为上海，允许公钥检索（MySQL 8 的安全要求）
+    username: ${SPRING_DATASOURCE_USERNAME:root}       # 数据库用户名
+    password: ${SPRING_DATASOURCE_PASSWORD:your_db_password}     # 数据库密码（通过环境变量注入）
+    driver-class-name: com.mysql.cj.jdbc.Driver        # MySQL 8.x 驱动
+
+  # ---------- JPA（ORM 框架） ----------
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+      # ddl-auto 策略：
+      # - update: 启动时自动根据实体类更新表结构（新增列、新增表），不会删除已有数据
+      # - create: 每次启动都重建表（会丢数据，仅开发用）
+      # - none: 不做任何操作（生产环境推荐）
+    show-sql: true                   # 在控制台打印 SQL 语句（调试用，生产环境应关闭）
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect    # MySQL 8 方言
+
+# ==================== AI 大模型配置（智谱 GLM-4） ====================
+# 这些配置用于 AiAnalysisService，调用智谱大模型 API 分析雷达数据
+ai:
+  api-key: ${AI_API_KEY:your_api_key_here}
+  # 智谱 API 密钥，格式为 "密钥ID.密钥内容"（通过环境变量注入）
+  api-url: ${AI_API_URL:https://open.bigmodel.cn/api/paas/v4/chat/completions}
+  # 智谱 API 地址（Chat Completions 接口，兼容 OpenAI 格式）
+  model: ${AI_MODEL:glm-4-flash}
+  # 使用的模型：glm-4-flash（智谱的轻量级模型，速度快、成本低）

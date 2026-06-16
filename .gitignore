@@ -1,0 +1,49 @@
+# ===== Java / Maven =====
+target/
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+
+# ===== Node.js =====
+node_modules/
+package-lock.json
+
+# ===== IDE =====
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+.settings/
+.project
+.classpath
+.factorypath
+
+# ===== 构建产物 & 二进制包 =====
+out/
+*.tar
+*.zip
+*.gz
+
+# ===== 日志 =====
+*.log
+startup*.log
+
+# ===== 系统文件 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Docker 数据卷 =====
+db-data/
+
+# ===== 嵌套重复目录 =====
+elderly-care-backend/elderly-care-backend/
+
+# ===== 环境变量（含密钥的文件）=====
+.env
+
+# ===== 启动脚本生成的临时文件 =====
+start_log.txt

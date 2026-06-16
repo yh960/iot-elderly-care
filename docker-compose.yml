@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: elderly-care-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-your_db_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-elderly_care}
+      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-your_db_password}
+      TZ: ${TZ:-Asia/Shanghai}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./elderly_care.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      - elderly-care-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-your_db_password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  backend:
+    build:
+      context: ./elderly-care-backend
+      dockerfile: Dockerfile
+    image: elderly-care-backend:latest
+    container_name: elderly-care-backend
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-elderly_care}?useSSL=false&serverTimezone=${TZ:-Asia/Shanghai}&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-root}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-your_db_password}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${JPA_DDL_AUTO:-update}
+      SERVER_PORT: 8080
+      AI_API_KEY: ${AI_API_KEY:-your_api_key_here}
+      AI_API_URL: ${AI_API_URL:-https://open.bigmodel.cn/api/paas/v4/chat/completions}
+      AI_MODEL: ${AI_MODEL:-glm-4-flash}
+      TZ: ${TZ:-Asia/Shanghai}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - elderly-care-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/api/hello || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  frontend:
+    build:
+      context: ./elderlycarefrontend
+      dockerfile: Dockerfile
+    image: elderly-care-frontend:latest
+    container_name: elderly-care-frontend
+    restart: always
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      - backend
+    networks:
+      - elderly-care-network
+
+volumes:
+  db-data:
+    driver: local
+
+networks:
+  elderly-care-network:
+    driver: bridge
+    name: elderly-care-network
