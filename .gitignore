@@ -9,6 +9,7 @@ hs_err_pid*
 # ===== Node.js =====
 node_modules/
 package-lock.json
+package.json
 
 # ===== IDE =====
 .idea/
@@ -30,14 +31,28 @@ out/
 # ===== 日志 =====
 *.log
 startup*.log
+start_log.txt
 
 # ===== 系统文件 =====
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# ===== Docker 数据卷 =====
+# ===== Docker 相关 =====
+docker-compose*.yml
+*/Dockerfile
+nginx.conf
+config/
+db-init/
 db-data/
+
+# ===== 本地启动脚本 =====
+start*
+stop*
+restart*
+*.bat
+*.sh
+*.ps1
 
 # ===== 旧项目残留 =====
 gradle.properties
@@ -45,13 +60,8 @@ gradle.properties
 # ===== 嵌套重复目录 =====
 elderly-care-backend/elderly-care-backend/
 
-# ===== 环境变量（含密钥的文件）=====
+# ===== 环境变量 =====
 .env
 
-# ===== 本地启动脚本 =====
-start*.bat
-start*.sh
-restart.*
-stop.*
+# ===== 部署文档 =====
 DEPLOYMENT.md
-start_log.txt
